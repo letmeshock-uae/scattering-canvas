@@ -10,6 +10,10 @@ export interface ParticleParams {
   exitLerp:       number  // скорость сброса ховера
 }
 
+// На touch-устройствах ограничиваем количество частиц для GPU мобильного
+const IS_TOUCH = navigator.maxTouchPoints > 0
+const PARTICLE_LIMIT = IS_TOUCH ? 400_000 : 1_500_000
+
 const DEFAULT_PARAMS: ParticleParams = {
   step:            1,
   proximityRadius: 0.55,
@@ -42,7 +46,11 @@ export class ParticleSystem {
 
     window.addEventListener('mousemove',    this.onMouseMove)
     document.addEventListener('mouseleave', this.onMouseLeave)
-    window.addEventListener('resize',       this.onResize)
+    window.addEventListener('touchstart',  this.onTouchStart, { passive: true })
+    window.addEventListener('touchmove',   this.onTouchMove,  { passive: true })
+    window.addEventListener('touchend',    this.onTouchEnd)
+    window.addEventListener('touchcancel', this.onTouchEnd)
+    window.addEventListener('resize',      this.onResize)
 
     this.animate()
   }
@@ -69,7 +77,9 @@ export class ParticleSystem {
 
     const W    = window.innerWidth
     const H    = window.innerHeight
-    const STEP = this.params.step
+    // Auto-step: на мобиле лимит 400k частиц, на десктопе 1.5M
+    const autoStep = Math.max(1, Math.round(Math.sqrt((W * H) / PARTICLE_LIMIT)))
+    const STEP = Math.max(this.params.step, autoStep)
     const cols  = Math.floor(W / STEP)
     const rows  = Math.floor(H / STEP)
     const count = cols * rows
@@ -116,17 +126,27 @@ export class ParticleSystem {
     this.scene.add(new THREE.Points(geo, this.material))
   }
 
-  private onMouseMove = (e: MouseEvent) => {
+  private setPointer(clientX: number, clientY: number) {
     this.hoverTarget = 1
     this.mouseNDC.set(
-      (e.clientX / window.innerWidth)  *  2 - 1,
-      (e.clientY / window.innerHeight) * -2 + 1
+      (clientX / window.innerWidth)  *  2 - 1,
+      (clientY / window.innerHeight) * -2 + 1
     )
   }
-  private onMouseLeave = () => {
-    this.hoverTarget = 0
-    this.mouseNDC.set(-99, -99)
+
+  private onMouseMove  = (e: MouseEvent) => { this.setPointer(e.clientX, e.clientY) }
+  private onMouseLeave = () => { this.hoverTarget = 0; this.mouseNDC.set(-99, -99) }
+
+  private onTouchStart = (e: TouchEvent) => {
+    const t = e.touches[0]
+    if (t) this.setPointer(t.clientX, t.clientY)
   }
+  private onTouchMove = (e: TouchEvent) => {
+    const t = e.touches[0]
+    if (t) this.setPointer(t.clientX, t.clientY)
+  }
+  private onTouchEnd = () => { this.hoverTarget = 0; this.mouseNDC.set(-99, -99) }
+
   private onResize = () => { this.renderer.setSize(window.innerWidth, window.innerHeight) }
 
   private animate = () => {
@@ -148,6 +168,10 @@ export class ParticleSystem {
     cancelAnimationFrame(this.raf)
     window.removeEventListener('mousemove',    this.onMouseMove)
     document.removeEventListener('mouseleave', this.onMouseLeave)
+    window.removeEventListener('touchstart',   this.onTouchStart)
+    window.removeEventListener('touchmove',    this.onTouchMove)
+    window.removeEventListener('touchend',     this.onTouchEnd)
+    window.removeEventListener('touchcancel',  this.onTouchEnd)
     window.removeEventListener('resize',       this.onResize)
     this.renderer.dispose()
   }
