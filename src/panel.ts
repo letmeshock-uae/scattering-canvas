@@ -162,6 +162,10 @@ export function createPanel(ps: ParticleSystem): void {
     if ((e.target as HTMLElement).closest('.pp-toggle')) return
     dragging = true
     const rect = panel.getBoundingClientRect()
+    // Переводим позицию на left+top и сбрасываем right чтобы не конфликтовали
+    panel.style.left  = rect.left + 'px'
+    panel.style.top   = rect.top  + 'px'
+    panel.style.right = ''
     dragOffX = e.clientX - rect.left
     dragOffY = e.clientY - rect.top
     document.body.style.cursor = 'grabbing'
