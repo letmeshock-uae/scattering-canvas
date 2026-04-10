@@ -17,10 +17,10 @@ const SLIDERS: SliderDef[] = [
 ]
 
 const DENSITY_OPTIONS = [
-  { label: 'Low',       step: 4 },
-  { label: 'Med',       step: 3 },
-  { label: 'High',      step: 2 },
-  { label: 'V.High',    step: 1 },
+  { label: 'Low',    step: 2   },
+  { label: 'Med',    step: 1.5 },
+  { label: 'High',   step: 1   },
+  { label: 'V.High', step: 0.5 },
 ]
 
 export function createPanel(ps: ParticleSystem): void {

@@ -16,7 +16,7 @@ const IS_TOUCH = navigator.maxTouchPoints > 0
 const MOBILE_LIMIT = 400_000
 
 const DEFAULT_PARAMS: ParticleParams = {
-  step:            2,
+  step:            1,
   proximityRadius: 0.55,
   scatterDist:     0.8,
   enterLerp:       0.10,
@@ -80,9 +80,9 @@ export class ParticleSystem {
 
     const W    = window.innerWidth
     const H    = window.innerHeight
-    // На мобиле ограничиваем кол-во частиц; на десктопе используем step напрямую
-    const mobileStep = IS_TOUCH ? Math.max(1, Math.round(Math.sqrt((W * H) / MOBILE_LIMIT))) : 1
-    const STEP = Math.max(this.params.step, mobileStep)
+    // На мобиле: step минимум 1 + лимит частиц; на десктопе — напрямую (дробный step разрешён)
+    const mobileMin  = IS_TOUCH ? Math.max(1, Math.round(Math.sqrt((W * H) / MOBILE_LIMIT))) : 0
+    const STEP = Math.max(this.params.step, mobileMin)
     const cols  = Math.floor(W / STEP)
     const rows  = Math.floor(H / STEP)
     const count = cols * rows
