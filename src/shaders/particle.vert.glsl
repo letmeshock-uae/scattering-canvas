@@ -20,9 +20,10 @@ void main() {
   vec2 pos = aOrigin * 2.0 - 1.0;
   pos.y *= -1.0;
 
-  // Близость к курсору: 1.0 — под курсором, 0.0 — далеко
+  // Гауссово затухание: максимум под курсором, экспоненциально угасает к краям радиуса
   float cursorDist = length(uMouse - pos);
-  float proximity  = smoothstep(uProximityRadius, 0.0, cursorDist);
+  float t          = clamp(cursorDist / uProximityRadius, 0.0, 1.0);
+  float proximity  = exp(-t * t * 5.0);
 
   // t: насколько частица рассеяна (курсорная близость × глобальный toggle)
   float t = proximity * uHover;
