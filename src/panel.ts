@@ -103,7 +103,7 @@ export function createPanel(ps: ParticleSystem): void {
 
     slider.addEventListener('input', () => {
       const n = parseFloat(slider.value)
-      ;(ps.params as Record<string, number>)[key] = n
+      ;(ps.params as unknown as Record<string, number>)[key] = n
       val.textContent = String(n.toFixed(step < 0.01 ? 3 : 2))
     })
 
