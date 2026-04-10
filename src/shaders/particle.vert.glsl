@@ -22,10 +22,10 @@ void main() {
 
   // Сплайновый спад: max в центре, точно 0 на границе радиуса, нет артефактов снаружи
   float cursorDist = length(uMouse - pos);
-  float t          = clamp(cursorDist / uProximityRadius, 0.0, 1.0);
-  float proximity  = pow(max(0.0, 1.0 - t * t), 2.5);
+  float nt         = clamp(cursorDist / uProximityRadius, 0.0, 1.0); // нормализованное расстояние
+  float proximity  = pow(max(0.0, 1.0 - nt * nt), 2.5);
 
-  // t: насколько частица рассеяна (курсорная близость × глобальный toggle)
+  // насколько частица рассеяна (курсорная близость × глобальный toggle)
   float t = proximity * uHover;
 
   // Рассеяние по случайному направлению
