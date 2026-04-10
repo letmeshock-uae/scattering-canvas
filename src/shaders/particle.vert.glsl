@@ -5,11 +5,12 @@ attribute float aR2;    // дистанция: [0, 1)
 uniform float uHover;
 uniform float uTime;
 uniform vec2  uMouse;
+uniform vec2  uMouseVel;        // сглаженная скорость курсора (NDC/frame)
 uniform sampler2D uTexture;
 uniform float uStep;
 uniform float uDpr;
-uniform float uProximityRadius; // smoothstep radius в NDC
-uniform float uScatterDist;     // максимальная дистанция рассеяния
+uniform float uProximityRadius;
+uniform float uScatterDist;
 
 varying vec4 vColor;
 
@@ -28,10 +29,16 @@ void main() {
   // насколько частица рассеяна (курсорная близость × глобальный toggle)
   float t = proximity * uHover;
 
-  // Рассеяние по случайному направлению
-  float angle = aR1 * 6.2832;
-  float dist  = uScatterDist * (0.25 + aR2 * 0.75);
-  pos += vec2(cos(angle), sin(angle)) * dist * t;
+  // Направление разлёта: блендинг между случайным и направлением движения курсора
+  vec2  randomDir = vec2(cos(aR1 * 6.2832), sin(aR1 * 6.2832));
+  float velLen    = length(uMouseVel);
+  // Чем быстрее курсор — тем сильнее точки летят в его направлении (до 90%)
+  float velInfl   = clamp(velLen * 10.0, 0.0, 0.9);
+  vec2  velDir    = velLen > 0.0001 ? uMouseVel / velLen : randomDir;
+  vec2  scatterDir = normalize(mix(randomDir, velDir, velInfl));
+
+  float dist = uScatterDist * (0.25 + aR2 * 0.75);
+  pos += scatterDir * dist * t;
 
   // Медленный дрейф — только в рассеянном состоянии
   pos += vec2(
