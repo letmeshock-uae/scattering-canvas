@@ -56,5 +56,6 @@ void main() {
   gl_Position = vec4(pos, 0.0, 1.0);
 
   float restSize = uStep * uDpr;
-  gl_PointSize   = mix(restSize, 1.5 + aR1 * 1.5, t);
+  // max(1.0) — WebGL требует минимум 1 device pixel (важно для step=0.5 на DPR=1)
+  gl_PointSize   = max(1.0, mix(restSize, 1.5 + aR1 * 1.5, t));
 }

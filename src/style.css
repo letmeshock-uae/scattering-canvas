@@ -45,14 +45,14 @@ html, body {
   color: var(--fg);
 }
 
-/* ── Logo ─────────────────────────────────────────────────── */
+/* ── Logo — правее панели (260px + 20px + зазор) ─────────── */
 .datum-logo {
   position: absolute;
   top: 20px;
-  left: 24px;
+  left: 300px;
 }
 .datum-logo img {
-  height: 20px;
+  height: 48px;
   width: auto;
   display: block;
 }
@@ -115,19 +115,19 @@ html, body {
   line-height: 1.5;
 }
 
-/* ── Large wordmark at bottom ─────────────────────────────── */
+/* ── Large wordmark at bottom — полная ширина вьюпорта ──────── */
 .datum-wordmark {
   position: absolute;
-  left: 0.58%;
-  right: 0.58%;
+  left: 0;
+  right: 0;
   bottom: 0;
-  overflow: hidden;
-  line-height: 0.82;
+  line-height: 0;
 }
 .datum-wordmark img {
   width: 100%;
   height: auto;
   display: block;
+  vertical-align: bottom;
 }
 
 /* ── Mobile ───────────────────────────────────────────────── */
@@ -155,7 +155,7 @@ html, body {
 .pp-panel {
   position: fixed;
   top: 20px;
-  right: 20px;
+  left: 20px;
   z-index: 9999;
   width: 260px;
   background: rgba(1, 1, 1, 0.88);
