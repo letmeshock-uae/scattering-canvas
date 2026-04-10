@@ -45,9 +45,16 @@ html, body {
 }
 
 #content-layer {
+  width: 100%;
   max-width: 640px;
   padding: 3rem 2rem;
   color: var(--fg);
+}
+
+@media (max-width: 480px) {
+  #content-layer {
+    padding: 2rem 1.25rem;
+  }
 }
 
 #content-layer h1 {

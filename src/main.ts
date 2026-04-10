@@ -13,15 +13,26 @@ async function bootstrap() {
 
   const snapshot = await captureElement(root)
 
-  // Текст прозрачен по цвету — невидим, но живёт в DOM для выделения курсором
   root.classList.add('is-captured')
-  // Canvas ниже DOM-слоя; события мыши/тача слушаются на window — пробиваются всегда
   glCanvas.style.pointerEvents = 'none'
 
   const particles = new ParticleSystem(glCanvas)
   await particles.init(snapshot)
 
   createPanel(particles)
+
+  // При resize пересобираем частицы под новый viewport
+  let resizeTimer = 0
+  window.addEventListener('resize', () => {
+    clearTimeout(resizeTimer)
+    resizeTimer = window.setTimeout(async () => {
+      // Временно убираем is-captured чтобы html2canvas увидел реальные цвета
+      root.classList.remove('is-captured')
+      const newSnapshot = await captureElement(root)
+      root.classList.add('is-captured')
+      await particles.rebuild(newSnapshot)
+    }, 300)
+  })
 }
 
 bootstrap()

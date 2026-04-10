@@ -60,10 +60,10 @@ export class ParticleSystem {
     await this.buildGeometry(sourceCanvas)
   }
 
-  /** Пересоздаёт геометрию с текущим this.params.step */
-  async rebuild() {
+  /** Пересоздаёт геометрию; опционально обновляет исходный canvas (для resize) */
+  async rebuild(newSource?: HTMLCanvasElement) {
+    if (newSource) this.sourceCanvas = newSource
     if (!this.sourceCanvas) return
-    // Чистим старую сцену
     this.scene.clear()
     this.material = null
     await this.buildGeometry(this.sourceCanvas)
