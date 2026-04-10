@@ -76,6 +76,37 @@ export function createPanel(ps: ParticleSystem): void {
   densityRow.append(densityLabel, densitySeg)
   body.appendChild(densityRow)
 
+  // ── Scatter mode toggle ──────────────────────────────
+  const modeRow = document.createElement('div')
+  modeRow.className = 'pp-row pp-row--density'
+
+  const modeLabel = document.createElement('span')
+  modeLabel.className = 'pp-label'
+  modeLabel.textContent = 'Mode'
+
+  const modeSeg = document.createElement('div')
+  modeSeg.className = 'pp-seg'
+
+  const MODES: { label: string; value: 0 | 1 }[] = [
+    { label: 'Random', value: 0 },
+    { label: 'Magnet', value: 1 },
+  ]
+
+  MODES.forEach(({ label, value }) => {
+    const btn = document.createElement('button')
+    btn.className = 'pp-seg-btn' + (ps.params.scatterMode === value ? ' pp-seg-btn--active' : '')
+    btn.textContent = label
+    btn.addEventListener('click', () => {
+      modeSeg.querySelectorAll('.pp-seg-btn').forEach(b => b.classList.remove('pp-seg-btn--active'))
+      btn.classList.add('pp-seg-btn--active')
+      ps.params.scatterMode = value
+    })
+    modeSeg.appendChild(btn)
+  })
+
+  modeRow.append(modeLabel, modeSeg)
+  body.appendChild(modeRow)
+
   // Sliders
   SLIDERS.forEach(({ key, label, min, max, step }) => {
     const row = document.createElement('div')

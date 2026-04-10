@@ -3,11 +3,12 @@ import vertexShader from './shaders/particle.vert.glsl?raw'
 import fragmentShader from './shaders/particle.frag.glsl?raw'
 
 export interface ParticleParams {
-  step:           number  // плотность: размер сетки (1 = максимум)
-  proximityRadius: number  // радиус влияния курсора в NDC
-  scatterDist:    number  // дальность разлёта
-  enterLerp:      number  // скорость набора ховера
-  exitLerp:       number  // скорость сброса ховера
+  step:            number   // плотность: размер сетки (1 = максимум)
+  proximityRadius: number   // радиус влияния курсора в NDC
+  scatterDist:     number   // дальность разлёта
+  enterLerp:       number   // скорость набора ховера
+  exitLerp:        number   // скорость сброса ховера
+  scatterMode:     0 | 1    // 0 = случайный разлёт, 1 = магнитная репульсия
 }
 
 // На touch-устройствах ограничиваем количество частиц
@@ -20,6 +21,7 @@ const DEFAULT_PARAMS: ParticleParams = {
   scatterDist:     0.8,
   enterLerp:       0.10,
   exitLerp:        0.06,
+  scatterMode:     1,
 }
 
 export class ParticleSystem {
@@ -27,11 +29,12 @@ export class ParticleSystem {
   private camera: THREE.OrthographicCamera
   private renderer: THREE.WebGLRenderer
   private material: THREE.ShaderMaterial | null = null
-  private hoverTarget = 0
-  private hover       = 0
-  private raf         = 0
-  private startTime   = performance.now()
-  private mouseNDC    = new THREE.Vector2(-99, -99)
+  private hoverTarget    = 0
+  private hover          = 0
+  private scatterModeLerp = 1   // плавный переход между режимами разлёта
+  private raf            = 0
+  private startTime      = performance.now()
+  private mouseNDC       = new THREE.Vector2(-99, -99)
   private sourceCanvas: HTMLCanvasElement | null = null
 
   params: ParticleParams = { ...DEFAULT_PARAMS }
@@ -112,6 +115,7 @@ export class ParticleSystem {
         uHover:           { value: this.hover },
         uTime:            { value: 0 },
         uMouse:           { value: this.mouseNDC },
+        uScatterMode:     { value: this.scatterModeLerp },
         uTexture:         { value: texture },
         uStep:            { value: STEP },
         uDpr:             { value: dpr },
@@ -153,12 +157,16 @@ export class ParticleSystem {
     this.raf = requestAnimationFrame(this.animate)
     if (!this.material) return
 
-    const { enterLerp, exitLerp, proximityRadius, scatterDist } = this.params
+    const { enterLerp, exitLerp, proximityRadius, scatterDist, scatterMode } = this.params
     this.hover += (this.hoverTarget - this.hover) * (this.hoverTarget === 0 ? exitLerp : enterLerp)
     if (this.hover < 0.004) this.hover = 0
 
+    // Плавный переход между режимами (0.06 per frame ≈ ~0.3s)
+    this.scatterModeLerp += (scatterMode - this.scatterModeLerp) * 0.06
+
     this.material.uniforms.uHover.value           = this.hover
     this.material.uniforms.uTime.value            = (performance.now() - this.startTime) / 1000
+    this.material.uniforms.uScatterMode.value     = this.scatterModeLerp
     this.material.uniforms.uProximityRadius.value = proximityRadius
     this.material.uniforms.uScatterDist.value     = scatterDist
     this.renderer.render(this.scene, this.camera)
