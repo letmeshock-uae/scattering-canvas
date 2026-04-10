@@ -14,12 +14,34 @@ html, body {
   overflow: hidden;
 }
 
-/* DOM-слой — виден только до захвата, потом opacity:0 */
+/* DOM-слой — до захвата виден, после — прозрачный но интерактивный */
 #portfolio-root {
   position: fixed; inset: 0;
+  z-index: 1;
   display: flex; align-items: center; justify-content: center;
   pointer-events: none;
-  transition: opacity 0.4s ease;
+}
+
+/* После захвата: текст прозрачен (невидим), но доступен для выделения */
+#portfolio-root.is-captured {
+  pointer-events: auto;
+  -webkit-user-select: text;
+  user-select: text;
+}
+
+#portfolio-root.is-captured,
+#portfolio-root.is-captured * {
+  color: transparent !important;
+  -webkit-text-fill-color: transparent !important;
+  border-color: transparent !important;
+  background-color: transparent !important;
+  text-decoration-color: transparent !important;
+  text-shadow: none !important;
+}
+
+/* Ссылки не перехватывают клики — иначе случайно откроют href */
+#portfolio-root.is-captured a {
+  pointer-events: none;
 }
 
 #content-layer {

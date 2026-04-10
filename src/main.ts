@@ -12,12 +12,14 @@ async function bootstrap() {
   await document.fonts.ready
 
   const snapshot = await captureElement(root)
-  root.style.opacity = '0'
+
+  // Текст прозрачен по цвету — невидим, но живёт в DOM для выделения курсором
+  root.classList.add('is-captured')
+  // Canvas ниже DOM-слоя; события мыши/тача слушаются на window — пробиваются всегда
+  glCanvas.style.pointerEvents = 'none'
 
   const particles = new ParticleSystem(glCanvas)
   await particles.init(snapshot)
-
-  glCanvas.style.pointerEvents = 'auto'
 
   createPanel(particles)
 }
