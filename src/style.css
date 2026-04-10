@@ -45,11 +45,11 @@ html, body {
   color: var(--fg);
 }
 
-/* ── Logo — правее панели (260px + 20px + зазор) ─────────── */
+/* ── Logo — верхний левый угол ─────────────────────────── */
 .datum-logo {
   position: absolute;
   top: 20px;
-  left: 300px;
+  left: 20px;
 }
 .datum-logo img {
   height: 48px;
@@ -177,8 +177,9 @@ html, body {
   justify-content: space-between;
   padding: 10px 12px 9px;
   border-bottom: 1px solid rgba(218, 248, 53, 0.1);
-  cursor: default;
+  cursor: grab;
 }
+.pp-header:active { cursor: grabbing; }
 
 .pp-title {
   font-size: 10px;

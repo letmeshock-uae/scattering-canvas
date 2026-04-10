@@ -154,6 +154,34 @@ export function createPanel(ps: ParticleSystem): void {
     panel.style.width   = collapsed ? 'auto' : ''
   })
 
+  // ── Draggable ─────────────────────────────────────────
+  let dragging = false
+  let dragOffX = 0, dragOffY = 0
+
+  header.addEventListener('mousedown', (e) => {
+    if ((e.target as HTMLElement).closest('.pp-toggle')) return
+    dragging = true
+    const rect = panel.getBoundingClientRect()
+    dragOffX = e.clientX - rect.left
+    dragOffY = e.clientY - rect.top
+    document.body.style.cursor = 'grabbing'
+    e.preventDefault()
+  })
+
+  document.addEventListener('mousemove', (e) => {
+    if (!dragging) return
+    const x = Math.max(0, Math.min(window.innerWidth  - panel.offsetWidth,  e.clientX - dragOffX))
+    const y = Math.max(0, Math.min(window.innerHeight - panel.offsetHeight, e.clientY - dragOffY))
+    panel.style.left = x + 'px'
+    panel.style.top  = y + 'px'
+  })
+
+  document.addEventListener('mouseup', () => {
+    if (!dragging) return
+    dragging = false
+    document.body.style.cursor = ''
+  })
+
   panel.append(header, body)
   document.body.appendChild(panel)
 }
