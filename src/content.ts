@@ -1,19 +1,19 @@
 export function injectContent(root: HTMLElement) {
   root.innerHTML = `
-    <p class="role">Art Director & Creative Developer</p>
-    <h1>Craft that<br>thinks.</h1>
+    <p class="role">Digital Twin Technology</p>
+    <h1>Reality,<br>mirrored.</h1>
     <p>
-      I design and build digital experiences at the
-      intersection of visual culture and engineering.
-      Currently open to select projects.
+      We build living replicas of physical systems — infrastructure,
+      factories, cities — that think, predict, and adapt in real time.
+      Where data becomes a world you can act inside.
     </p>
     <p>
-      Based in Dubai — working globally.
+      From sensor to simulation. From insight to decision.
     </p>
     <div class="links">
-      <a href="mailto:hello@you.com">Email</a>
-      <a href="https://instagram.com">Instagram</a>
-      <a href="https://github.com">GitHub</a>
+      <a href="mailto:hello@example.com">Contact</a>
+      <a href="https://example.com">Platform</a>
+      <a href="https://example.com">Case Studies</a>
     </div>
   `
 }
