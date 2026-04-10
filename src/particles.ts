@@ -10,12 +10,12 @@ export interface ParticleParams {
   exitLerp:       number  // скорость сброса ховера
 }
 
-// На touch-устройствах ограничиваем количество частиц для GPU мобильного
+// На touch-устройствах ограничиваем количество частиц
 const IS_TOUCH = navigator.maxTouchPoints > 0
-const PARTICLE_LIMIT = IS_TOUCH ? 400_000 : 1_500_000
+const MOBILE_LIMIT = 400_000
 
 const DEFAULT_PARAMS: ParticleParams = {
-  step:            1,
+  step:            2,
   proximityRadius: 0.55,
   scatterDist:     0.8,
   enterLerp:       0.10,
@@ -77,9 +77,9 @@ export class ParticleSystem {
 
     const W    = window.innerWidth
     const H    = window.innerHeight
-    // Auto-step: на мобиле лимит 400k частиц, на десктопе 1.5M
-    const autoStep = Math.max(1, Math.round(Math.sqrt((W * H) / PARTICLE_LIMIT)))
-    const STEP = Math.max(this.params.step, autoStep)
+    // На мобиле ограничиваем кол-во частиц; на десктопе используем step напрямую
+    const mobileStep = IS_TOUCH ? Math.max(1, Math.round(Math.sqrt((W * H) / MOBILE_LIMIT))) : 1
+    const STEP = Math.max(this.params.step, mobileStep)
     const cols  = Math.floor(W / STEP)
     const rows  = Math.floor(H / STEP)
     const count = cols * rows
