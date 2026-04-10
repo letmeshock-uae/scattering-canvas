@@ -5,7 +5,6 @@ attribute float aR2;    // дистанция: [0, 1)
 uniform float uHover;
 uniform float uTime;
 uniform vec2  uMouse;
-uniform vec2  uMouseVel;        // сглаженная скорость курсора (NDC/frame)
 uniform sampler2D uTexture;
 uniform float uStep;
 uniform float uDpr;
@@ -29,13 +28,15 @@ void main() {
   // насколько частица рассеяна (курсорная близость × глобальный toggle)
   float t = proximity * uHover;
 
-  // Направление разлёта: блендинг между случайным и направлением движения курсора
-  vec2  randomDir = vec2(cos(aR1 * 6.2832), sin(aR1 * 6.2832));
-  float velLen    = length(uMouseVel);
-  // Чем быстрее курсор — тем сильнее точки летят в его направлении (до 90%)
-  float velInfl   = clamp(velLen * 10.0, 0.0, 0.9);
-  vec2  velDir    = velLen > 0.0001 ? uMouseVel / velLen : randomDir;
-  vec2  scatterDir = normalize(mix(randomDir, velDir, velInfl));
+  // Репульсия: точки летят ОТ курсора (как одинаковые полюса магнита)
+  vec2  fromCursor  = pos - uMouse;
+  float fromLen     = length(fromCursor);
+  vec2  repulseDir  = fromLen > 0.001 ? fromCursor / fromLen
+                                       : vec2(cos(aR1 * 6.2832), sin(aR1 * 6.2832));
+
+  // Небольшая случайность (~25%) чтобы разлёт выглядел органично, не строго радиально
+  vec2 randomDir   = vec2(cos(aR1 * 6.2832), sin(aR1 * 6.2832));
+  vec2 scatterDir  = normalize(mix(repulseDir, randomDir, 0.25));
 
   float dist = uScatterDist * (0.25 + aR2 * 0.75);
   pos += scatterDir * dist * t;

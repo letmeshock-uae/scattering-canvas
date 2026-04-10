@@ -32,7 +32,6 @@ export class ParticleSystem {
   private raf         = 0
   private startTime   = performance.now()
   private mouseNDC    = new THREE.Vector2(-99, -99)
-  private velNDC      = new THREE.Vector2(0, 0)   // сглаженная скорость курсора в NDC
   private sourceCanvas: HTMLCanvasElement | null = null
 
   params: ParticleParams = { ...DEFAULT_PARAMS }
@@ -113,7 +112,6 @@ export class ParticleSystem {
         uHover:           { value: this.hover },
         uTime:            { value: 0 },
         uMouse:           { value: this.mouseNDC },
-        uMouseVel:        { value: this.velNDC },
         uTexture:         { value: texture },
         uStep:            { value: STEP },
         uDpr:             { value: dpr },
@@ -130,16 +128,10 @@ export class ParticleSystem {
 
   private setPointer(clientX: number, clientY: number) {
     this.hoverTarget = 1
-    const nx = (clientX / window.innerWidth)  *  2 - 1
-    const ny = (clientY / window.innerHeight) * -2 + 1
-    // Считаем дельту и накапливаем в сглаженную скорость (EMA)
-    if (this.mouseNDC.x > -90) {
-      const dx = nx - this.mouseNDC.x
-      const dy = ny - this.mouseNDC.y
-      this.velNDC.x = this.velNDC.x * 0.5 + dx * 0.5
-      this.velNDC.y = this.velNDC.y * 0.5 + dy * 0.5
-    }
-    this.mouseNDC.set(nx, ny)
+    this.mouseNDC.set(
+      (clientX / window.innerWidth)  *  2 - 1,
+      (clientY / window.innerHeight) * -2 + 1
+    )
   }
 
   private onMouseMove  = (e: MouseEvent) => { this.setPointer(e.clientX, e.clientY) }
@@ -164,9 +156,6 @@ export class ParticleSystem {
     const { enterLerp, exitLerp, proximityRadius, scatterDist } = this.params
     this.hover += (this.hoverTarget - this.hover) * (this.hoverTarget === 0 ? exitLerp : enterLerp)
     if (this.hover < 0.004) this.hover = 0
-
-    // Затухание скорости — без движения курсора вектор стремится к 0
-    this.velNDC.multiplyScalar(0.82)
 
     this.material.uniforms.uHover.value           = this.hover
     this.material.uniforms.uTime.value            = (performance.now() - this.startTime) / 1000
