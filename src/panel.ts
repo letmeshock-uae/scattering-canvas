@@ -87,9 +87,10 @@ export function createPanel(ps: ParticleSystem): void {
   const modeSeg = document.createElement('div')
   modeSeg.className = 'pp-seg'
 
-  const MODES: { label: string; value: 0 | 1 }[] = [
-    { label: 'Random', value: 0 },
-    { label: 'Magnet', value: 1 },
+  const MODES: { label: string; value: -1 | 0 | 1 }[] = [
+    { label: 'Attract', value: -1 },
+    { label: 'Random',  value:  0 },
+    { label: 'Repel',   value:  1 },
   ]
 
   MODES.forEach(({ label, value }) => {
@@ -99,7 +100,7 @@ export function createPanel(ps: ParticleSystem): void {
     btn.addEventListener('click', () => {
       modeSeg.querySelectorAll('.pp-seg-btn').forEach(b => b.classList.remove('pp-seg-btn--active'))
       btn.classList.add('pp-seg-btn--active')
-      ps.params.scatterMode = value
+      ps.params.scatterMode = value as -1 | 0 | 1
     })
     modeSeg.appendChild(btn)
   })

@@ -8,7 +8,7 @@ export interface ParticleParams {
   scatterDist:     number   // дальность разлёта
   enterLerp:       number   // скорость набора ховера
   exitLerp:        number   // скорость сброса ховера
-  scatterMode:     0 | 1    // 0 = случайный разлёт, 1 = магнитная репульсия
+  scatterMode:     -1 | 0 | 1  // -1 = притяжение, 0 = случайный, 1 = отталкивание
 }
 
 // На touch-устройствах ограничиваем количество частиц
@@ -21,7 +21,7 @@ const DEFAULT_PARAMS: ParticleParams = {
   scatterDist:     0.8,
   enterLerp:       0.10,
   exitLerp:        0.06,
-  scatterMode:     1,
+  scatterMode:     1 as -1 | 0 | 1,
 }
 
 export class ParticleSystem {

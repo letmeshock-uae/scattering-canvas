@@ -29,18 +29,20 @@ void main() {
   // насколько частица рассеяна (курсорная близость × глобальный toggle)
   float t = proximity * uHover;
 
-  // Случайное направление (режим 0)
-  vec2 randomDir = vec2(cos(aR1 * 6.2832), sin(aR1 * 6.2832));
-
-  // Магнитная репульсия: от курсора наружу (режим 1)
+  // Базовые направления
+  vec2  randomDir  = vec2(cos(aR1 * 6.2832), sin(aR1 * 6.2832));
   vec2  fromCursor = pos - uMouse;
   float fromLen    = length(fromCursor);
-  vec2  repulseDir = fromLen > 0.001 ? fromCursor / fromLen : randomDir;
-  // ~25% случайности для органичности
-  vec2  magnetDir  = normalize(mix(repulseDir, randomDir, 0.25));
+  vec2  axis       = fromLen > 0.001 ? fromCursor / fromLen : randomDir;
 
-  // Плавный блендинг между режимами по uScatterMode
-  vec2 scatterDir = normalize(mix(randomDir, magnetDir, uScatterMode));
+  // Отталкивание (+) и притяжение (−) с ~25% случайным разбросом для органичности
+  vec2 repulseDir = normalize(mix( axis, randomDir, 0.25));
+  vec2 attractDir = normalize(mix(-axis, randomDir, 0.25));
+
+  // uScatterMode: 1 = repulse, 0 = random, -1 = attract (плавный blend по знаку)
+  float r = clamp( uScatterMode, 0.0, 1.0);  // сила отталкивания
+  float a = clamp(-uScatterMode, 0.0, 1.0);  // сила притяжения
+  vec2 scatterDir = normalize(mix(mix(randomDir, repulseDir, r), attractDir, a));
 
   float dist = uScatterDist * (0.25 + aR2 * 0.75);
   pos += scatterDir * dist * t;
