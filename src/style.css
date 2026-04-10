@@ -1,9 +1,8 @@
 :root {
-  --bg: #0a0a0a;
-  --fg: #f0ede6;
-  --accent: #c8b89a;
-  --font-display: 'Cormorant Garamond', Georgia, serif;
-  --font-body: 'Helvetica Neue', Helvetica, sans-serif;
+  --bg:         #010101;
+  --fg:         #ffffff;
+  --accent:     #daf835;
+  --font-body:  'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -14,15 +13,13 @@ html, body {
   overflow: hidden;
 }
 
-/* DOM-слой — до захвата виден, после — прозрачный но интерактивный */
+/* ── DOM-слой ─────────────────────────────────────────────── */
 #portfolio-root {
   position: fixed; inset: 0;
   z-index: 1;
-  display: flex; align-items: center; justify-content: center;
   pointer-events: none;
 }
 
-/* После захвата: текст прозрачен (невидим), но доступен для выделения */
 #portfolio-root.is-captured {
   pointer-events: auto;
   -webkit-user-select: text;
@@ -38,93 +35,140 @@ html, body {
   text-decoration-color: transparent !important;
   text-shadow: none !important;
 }
+#portfolio-root.is-captured img { opacity: 0 !important; }
+#portfolio-root.is-captured a { pointer-events: none; }
 
-/* Ссылки не перехватывают клики — иначе случайно откроют href */
-#portfolio-root.is-captured a {
-  pointer-events: none;
-}
-
+/* ── Content layer — full-page absolute ──────────────────── */
 #content-layer {
-  width: 100%;
-  max-width: 640px;
-  padding: 3rem 2rem;
+  position: absolute;
+  inset: 0;
   color: var(--fg);
 }
 
-@media (max-width: 480px) {
-  #content-layer {
-    padding: 2rem 1.25rem;
+/* ── Logo ─────────────────────────────────────────────────── */
+.datum-logo {
+  position: absolute;
+  top: 20px;
+  left: 24px;
+}
+.datum-logo img {
+  height: 20px;
+  width: auto;
+  display: block;
+}
+
+/* ── Navigation ───────────────────────────────────────────── */
+.datum-nav {
+  position: absolute;
+  top: 10px;
+  right: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  text-align: center;
+}
+.datum-nav a {
+  font-family: var(--font-body);
+  font-size: 16px;
+  font-weight: 400;
+  color: var(--fg);
+  text-decoration: none;
+  letter-spacing: -0.3px;
+  line-height: 1.5;
+}
+
+/* ── Hero center ──────────────────────────────────────────── */
+.datum-hero {
+  position: absolute;
+  left: 50%;
+  top: calc(50% - 186px);
+  transform: translate(-50%, -50%);
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+  align-items: center;
+  width: min(662px, calc(100% - 48px));
+  text-align: center;
+}
+
+.datum-tagline {
+  font-family: var(--font-body);
+  font-size: 16px;
+  font-weight: 400;
+  color: var(--fg);
+  line-height: 1.5;
+  letter-spacing: -0.3px;
+}
+
+.datum-cta {
+  font-family: var(--font-body);
+  font-size: 16px;
+  font-weight: 400;
+  color: var(--bg);
+  background: var(--accent);
+  border: none;
+  border-radius: 4px;
+  padding: 10px 14px;
+  cursor: pointer;
+  letter-spacing: -0.3px;
+  white-space: nowrap;
+  line-height: 1.5;
+}
+
+/* ── Large wordmark at bottom ─────────────────────────────── */
+.datum-wordmark {
+  position: absolute;
+  left: 0.58%;
+  right: 0.58%;
+  bottom: 0;
+  overflow: hidden;
+  line-height: 0.82;
+}
+.datum-wordmark img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* ── Mobile ───────────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .datum-nav {
+    display: none;
+  }
+  .datum-hero {
+    top: 40%;
+    width: calc(100% - 48px);
+  }
+  .datum-tagline {
+    font-size: 14px;
   }
 }
 
-#content-layer h1 {
-  font-family: var(--font-display);
-  font-size: clamp(2.4rem, 6vw, 5rem);
-  font-weight: 300;
-  letter-spacing: -0.02em;
-  line-height: 1.1;
-  color: var(--fg);
-  margin-bottom: 1.5rem;
-}
-
-#content-layer .role {
-  font-family: var(--font-body);
-  font-size: 0.75rem;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  color: var(--accent);
-  margin-bottom: 3rem;
-}
-
-#content-layer p {
-  font-family: var(--font-body);
-  font-size: 1rem;
-  line-height: 1.75;
-  color: rgba(240, 237, 230, 0.65);
-  margin-bottom: 1.25rem;
-}
-
-#content-layer .links {
-  margin-top: 3rem;
-  display: flex; gap: 2rem;
-}
-
-#content-layer .links a {
-  font-family: var(--font-body);
-  font-size: 0.75rem;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: var(--accent);
-  text-decoration: none;
-  border-bottom: 1px solid rgba(200, 184, 154, 0.3);
-  padding-bottom: 2px;
-}
-
-/* Three.js canvas */
+/* ── Three.js canvas ──────────────────────────────────────── */
 #gl-canvas {
   position: fixed; inset: 0;
   width: 100%; height: 100%;
   pointer-events: none;
 }
 
-/* ── Particle panel ─────────────────────────────────── */
+/* ── Particle panel ─────────────────────────────────────────── */
 .pp-panel {
   position: fixed;
   top: 20px;
   right: 20px;
   z-index: 9999;
   width: 260px;
-  background: rgba(10, 10, 10, 0.88);
-  border: 1px solid rgba(200, 184, 154, 0.18);
+  background: rgba(1, 1, 1, 0.88);
+  border: 1px solid rgba(218, 248, 53, 0.2);
   border-radius: 8px;
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  font-family: 'Helvetica Neue', Helvetica, sans-serif;
+  font-family: var(--font-body);
   font-size: 11px;
-  color: rgba(240, 237, 230, 0.7);
+  color: rgba(255, 255, 255, 0.6);
   user-select: none;
   pointer-events: all;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
 }
 
 .pp-header {
@@ -132,7 +176,7 @@ html, body {
   align-items: center;
   justify-content: space-between;
   padding: 10px 12px 9px;
-  border-bottom: 1px solid rgba(200, 184, 154, 0.12);
+  border-bottom: 1px solid rgba(218, 248, 53, 0.1);
   cursor: default;
 }
 
@@ -140,7 +184,7 @@ html, body {
   font-size: 10px;
   letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: rgba(200, 184, 154, 0.9);
+  color: rgba(218, 248, 53, 0.85);
   font-weight: 500;
 }
 
@@ -148,13 +192,13 @@ html, body {
   background: none;
   border: none;
   cursor: pointer;
-  color: rgba(200, 184, 154, 0.5);
+  color: rgba(218, 248, 53, 0.4);
   font-size: 12px;
   line-height: 1;
   padding: 0 2px;
   transition: color 0.15s;
 }
-.pp-toggle:hover { color: rgba(200, 184, 154, 0.9); }
+.pp-toggle:hover { color: rgba(218, 248, 53, 0.9); }
 
 .pp-body {
   padding: 12px 12px 14px;
@@ -163,7 +207,6 @@ html, body {
   gap: 14px;
 }
 
-/* Row */
 .pp-row {
   display: flex;
   flex-direction: column;
@@ -180,24 +223,23 @@ html, body {
   font-size: 10px;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: rgba(240, 237, 230, 0.45);
+  color: rgba(255, 255, 255, 0.35);
 }
 
 .pp-value {
   font-size: 11px;
   font-variant-numeric: tabular-nums;
-  color: rgba(200, 184, 154, 0.8);
+  color: rgba(218, 248, 53, 0.75);
   min-width: 36px;
   text-align: right;
 }
 
-/* Slider */
 .pp-slider {
   -webkit-appearance: none;
   appearance: none;
   width: 100%;
   height: 2px;
-  background: rgba(200, 184, 154, 0.15);
+  background: rgba(218, 248, 53, 0.12);
   border-radius: 2px;
   outline: none;
   cursor: pointer;
@@ -208,25 +250,24 @@ html, body {
   width: 12px;
   height: 12px;
   border-radius: 50%;
-  background: rgba(200, 184, 154, 0.85);
+  background: rgba(218, 248, 53, 0.8);
   border: none;
   cursor: pointer;
   transition: background 0.15s, transform 0.1s;
 }
 .pp-slider::-webkit-slider-thumb:hover {
-  background: #c8b89a;
+  background: #daf835;
   transform: scale(1.2);
 }
 .pp-slider::-moz-range-thumb {
   width: 12px;
   height: 12px;
   border-radius: 50%;
-  background: rgba(200, 184, 154, 0.85);
+  background: rgba(218, 248, 53, 0.8);
   border: none;
   cursor: pointer;
 }
 
-/* Density row */
 .pp-row--density {
   flex-direction: row;
   align-items: center;
@@ -240,10 +281,10 @@ html, body {
 }
 
 .pp-seg-btn {
-  background: rgba(200, 184, 154, 0.08);
-  border: 1px solid rgba(200, 184, 154, 0.15);
+  background: rgba(218, 248, 53, 0.06);
+  border: 1px solid rgba(218, 248, 53, 0.12);
   border-radius: 4px;
-  color: rgba(240, 237, 230, 0.45);
+  color: rgba(255, 255, 255, 0.4);
   font-family: inherit;
   font-size: 10px;
   letter-spacing: 0.06em;
@@ -252,11 +293,11 @@ html, body {
   transition: background 0.15s, color 0.15s, border-color 0.15s;
 }
 .pp-seg-btn:hover {
-  background: rgba(200, 184, 154, 0.14);
-  color: rgba(240, 237, 230, 0.75);
+  background: rgba(218, 248, 53, 0.12);
+  color: rgba(255, 255, 255, 0.7);
 }
 .pp-seg-btn--active {
-  background: rgba(200, 184, 154, 0.22);
-  border-color: rgba(200, 184, 154, 0.45);
-  color: rgba(200, 184, 154, 0.95);
+  background: rgba(218, 248, 53, 0.2);
+  border-color: rgba(218, 248, 53, 0.5);
+  color: #daf835;
 }
