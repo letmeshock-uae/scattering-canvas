@@ -41,6 +41,8 @@ async function bootstrap() {
     resizeTimer = window.setTimeout(async () => {
       // Временно убираем is-captured чтобы html2canvas увидел реальные цвета
       root.classList.remove('is-captured')
+      // Пересобираем контент с актуальными px-размерами (важно для SVG на мобилке)
+      injectContent(content)
       await waitForImages(content)
       const newSnapshot = await captureElement(root)
       root.classList.add('is-captured')
