@@ -108,6 +108,37 @@ export function createPanel(ps: ParticleSystem): void {
   modeRow.append(modeLabel, modeSeg)
   body.appendChild(modeRow)
 
+  // ── Invert mode toggle ───────────────────────────────
+  const invertRow = document.createElement('div')
+  invertRow.className = 'pp-row pp-row--density'
+
+  const invertLabel = document.createElement('span')
+  invertLabel.className = 'pp-label'
+  invertLabel.textContent = 'Effect'
+
+  const invertSeg = document.createElement('div')
+  invertSeg.className = 'pp-seg'
+
+  const EFFECTS: { label: string; invert: boolean }[] = [
+    { label: 'Normal', invert: false },
+    { label: 'Invert', invert: true  },
+  ]
+
+  EFFECTS.forEach(({ label, invert }) => {
+    const btn = document.createElement('button')
+    btn.className = 'pp-seg-btn' + (!ps.params.invertMode === !invert ? ' pp-seg-btn--active' : '')
+    btn.textContent = label
+    btn.addEventListener('click', () => {
+      invertSeg.querySelectorAll('.pp-seg-btn').forEach(b => b.classList.remove('pp-seg-btn--active'))
+      btn.classList.add('pp-seg-btn--active')
+      ps.params.invertMode = invert
+    })
+    invertSeg.appendChild(btn)
+  })
+
+  invertRow.append(invertLabel, invertSeg)
+  body.appendChild(invertRow)
+
   // Sliders
   SLIDERS.forEach(({ key, label, min, max, step }) => {
     const row = document.createElement('div')

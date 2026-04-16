@@ -6,6 +6,7 @@ uniform float uHover;
 uniform float uTime;
 uniform vec2  uMouse;
 uniform float uScatterMode;     // 0 = случайный разлёт, 1 = магнитная репульсия
+uniform float uInvert;          // 0 = normal, 1 = invert (разлёт по умолчанию, сборка у курсора)
 uniform sampler2D uTexture;
 uniform float uStep;
 uniform float uDpr;
@@ -26,8 +27,12 @@ void main() {
   float nt         = clamp(cursorDist / uProximityRadius, 0.0, 1.0); // нормализованное расстояние
   float proximity  = pow(max(0.0, 1.0 - nt * nt), 2.5);
 
-  // насколько частица рассеяна (курсорная близость × глобальный toggle)
-  float t = proximity * uHover;
+  // насколько частица рассеяна
+  // normal:  t = proximity * uHover  (разлёт у курсора)
+  // invert:  t = 1 - proximity * uHover  (разлёт везде, сборка у курсора)
+  float tNormal = proximity * uHover;
+  float tInvert = 1.0 - proximity * uHover;
+  float t = mix(tNormal, tInvert, uInvert);
 
   // Базовые направления
   vec2  randomDir  = vec2(cos(aR1 * 6.2832), sin(aR1 * 6.2832));

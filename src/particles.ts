@@ -9,6 +9,7 @@ export interface ParticleParams {
   enterLerp:       number   // скорость набора ховера
   exitLerp:        number   // скорость сброса ховера
   scatterMode:     -1 | 0 | 1  // -1 = притяжение, 0 = случайный, 1 = отталкивание
+  invertMode:      boolean  // true = разлёт по умолчанию, сборка у курсора
 }
 
 // На touch-устройствах ограничиваем количество частиц
@@ -22,6 +23,7 @@ const DEFAULT_PARAMS: ParticleParams = {
   enterLerp:       0.10,
   exitLerp:        0.06,
   scatterMode:     1 as -1 | 0 | 1,
+  invertMode:      false,
 }
 
 export class ParticleSystem {
@@ -32,6 +34,7 @@ export class ParticleSystem {
   private hoverTarget    = 0
   private hover          = 0
   private scatterModeLerp = 1   // плавный переход между режимами разлёта
+  private invertLerp     = 0   // плавный переход в/из invert mode
   private raf            = 0
   private startTime      = performance.now()
   private mouseNDC       = new THREE.Vector2(-99, -99)
@@ -116,6 +119,7 @@ export class ParticleSystem {
         uTime:            { value: 0 },
         uMouse:           { value: this.mouseNDC },
         uScatterMode:     { value: this.scatterModeLerp },
+        uInvert:          { value: this.invertLerp },
         uTexture:         { value: texture },
         uStep:            { value: STEP },
         uDpr:             { value: dpr },
@@ -157,16 +161,25 @@ export class ParticleSystem {
     this.raf = requestAnimationFrame(this.animate)
     if (!this.material) return
 
-    const { enterLerp, exitLerp, proximityRadius, scatterDist, scatterMode } = this.params
-    this.hover += (this.hoverTarget - this.hover) * (this.hoverTarget === 0 ? exitLerp : enterLerp)
+    const { enterLerp, exitLerp, proximityRadius, scatterDist, scatterMode, invertMode } = this.params
+
+    // В invert mode курсор всегда «активен» (hover = 1), чтобы формула 1 - proximity*hover работала
+    const effectiveHoverTarget = invertMode ? 1 : this.hoverTarget
+    this.hover += (effectiveHoverTarget - this.hover) * (effectiveHoverTarget === 0 ? exitLerp : enterLerp)
     if (this.hover < 0.004) this.hover = 0
 
     // Плавный переход между режимами (0.06 per frame ≈ ~0.3s)
     this.scatterModeLerp += (scatterMode - this.scatterModeLerp) * 0.06
 
+    // Плавный переход invert on/off
+    const invertTarget = invertMode ? 1 : 0
+    this.invertLerp += (invertTarget - this.invertLerp) * 0.06
+    if (Math.abs(this.invertLerp - invertTarget) < 0.002) this.invertLerp = invertTarget
+
     this.material.uniforms.uHover.value           = this.hover
     this.material.uniforms.uTime.value            = (performance.now() - this.startTime) / 1000
     this.material.uniforms.uScatterMode.value     = this.scatterModeLerp
+    this.material.uniforms.uInvert.value          = this.invertLerp
     this.material.uniforms.uProximityRadius.value = proximityRadius
     this.material.uniforms.uScatterDist.value     = scatterDist
     this.renderer.render(this.scene, this.camera)
